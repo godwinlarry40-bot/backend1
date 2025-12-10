@@ -1,0 +1,33 @@
+{
+  "name": "backend1",
+  "version": "1.0.0",
+  "description": "full api project",
+  "homepage": "https://github.com/godwinlarry40-bot/backend1#readme",
+  "bugs": {
+    "url": "https://github.com/godwinlarry40-bot/backend1/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/godwinlarry40-bot/backend1.git"
+  },
+  "license": "ISC",
+  "author": "Larry",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
