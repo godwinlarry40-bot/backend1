@@ -6,45 +6,63 @@ export const authenticate = async (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     
     if (!token) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        error: 'Access denied. No token provided.' 
+        message: 'Access denied. No token provided.'
       });
     }
-
+    
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId).select('-password');
     
     if (!user) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        error: 'User not found.' 
+        message: 'User not found.'
       });
     }
-
+    
     req.user = user;
     req.token = token;
     next();
   } catch (error) {
-    res.status(401).json({ 
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token.'
+      });
+    }
+    
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token expired.'
+      });
+    }
+    
+    res.status(500).json({
       success: false,
-      error: 'Invalid or expired token.' 
+      message: 'Server error during authentication.'
     });
   }
 };
 
-export const optionalAuth = async (req, res, next) => {
-  try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+export const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required.'
+      });
+    }
     
-    if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.userId).select('-password');
-      req.user = user;
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Insufficient permissions.'
+      });
     }
     
     next();
-  } catch (error) {
-    next();
-  }
+  };
 };
